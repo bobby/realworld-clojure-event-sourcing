@@ -10,9 +10,10 @@
    (publish-event! component (util/uuid) action data))
   ([component event-id action data]
    (publish-event! component event-id action data nil))
-  ([{:keys [stream redis] :as component} event-id action data parent]
-   (log/info ::publish-event! [stream event-id action data parent])
-   (let [event  {:event/id        event-id
+  ([{:keys [streams redis] :as component} event-id action data parent]
+   (log/info ::publish-event! [streams event-id action data parent])
+   (let [stream (:events streams)
+         event  {:event/id        event-id
                  :event/parent    parent
                  :event/action    action
                  :event/data      data

@@ -1,11 +1,18 @@
 (ns conduit.api.web
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.core.async :as a]
+            [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [io.pedestal.log :as log]
+            [reitit.http :as http]
             [reitit.ring :as ring]
-            [ring.middleware.keyword-params :as keyword-params]
-            [ring.middleware.params :as params]
-            [ring.middleware.session :as session]
+            [reitit.http.coercion :as coercion]
+            [reitit.http.spec :as spec]
+            [reitit.coercion.spec]
+            [reitit.interceptor.sieppari :as sieppari]
+            [reitit.http.interceptors.parameters :as parameters]
+            [reitit.http.interceptors.muuntaja :as muuntaja]
+            [reitit.http.interceptors.exception :as exception]
+            [muuntaja.core :as m]
             [immutant.web :as web]
             [conduit.api.domain :as domain])
   (:import [java.io ByteArrayInputStream]))
@@ -13,6 +20,11 @@
 (set! *warn-on-reflection* true)
 
 ;;;; Service Definition
+
+(defn create-article
+  [api {{{:keys [article]} :body} :parameters}]
+  {:status 201
+   :body   (domain/create-article-async! api article)})
 
 ;; TODO!!!
 (defn dummy
@@ -35,7 +47,9 @@
       :delete dummy}]]
    ["/articles"
     {:get  dummy
-     :post dummy}
+     :post {:parameters {:body :article/create-command}
+            :responses  {200 {:body {:article :conduit/article}}}
+            :handler    (partial create-article api)}}
     ["/feed"
      {:get dummy}]
     ["/:slug"
@@ -56,12 +70,28 @@
 (defn init-service
   [{:keys [development?]
     :as   config}]
-  (ring/ring-handler
-   (ring/router (routes config))
+  (http/ring-handler
+   (http/router
+    (routes config)
+    {:validate spec/validate
+     :data     {:coercion     reitit.coercion.spec/coercion
+                :muuntaja     m/instance
+                :interceptors [;; query-params & form-params
+                               (parameters/parameters-interceptor)
+                               ;; content-negotiation
+                               (muuntaja/format-negotiate-interceptor)
+                               ;; encoding response body
+                               (muuntaja/format-response-interceptor)
+                               ;; exception handling
+                               (exception/exception-interceptor)
+                               ;; decoding request body
+                               (muuntaja/format-request-interceptor)
+                               ;; coercing response bodys
+                               (coercion/coerce-response-interceptor)
+                               ;; coercing request parameters
+                               (coercion/coerce-request-interceptor)]}})
    (ring/create-default-handler)
-   {:middleware [keyword-params/wrap-keyword-params
-                 params/wrap-params
-                 session/wrap-session]}))
+   {:executor sieppari/executor}))
 
 (defn init-server
   [{:keys [service development? host port]}]

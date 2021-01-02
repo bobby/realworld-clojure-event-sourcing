@@ -44,8 +44,8 @@
         org.slf4j/log4j-over-slf4j     {:mvn/version "1.7.30"}
 
         ;; HTTP & Websocket
-        metosin/reitit-ring {:mvn/version "0.5.11"}
-        org.immutant/web    {:mvn/version "2.1.10"}
+        metosin/reitit   {:mvn/version "0.5.11"}
+        org.immutant/web {:mvn/version "2.1.10"}
 
         ;; Finite State Machine
         metosin/tilakone.core {:mvn/version "0.0.5-SNAPSHOT"}
