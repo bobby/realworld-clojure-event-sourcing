@@ -1,16 +1,13 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/bower_components
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-*.launch
-.settings/
-
+/target
+/classes
+/checkouts
+*.jar
+*.class
+/.cpcache
+/.lein-*
+/.nrepl-history
+/.nrepl-port
+/logs
 
 #System Files
 .DS_Store
