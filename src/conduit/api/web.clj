@@ -20,38 +20,36 @@
   {:status 200})
 
 (defn routes
-  [{:keys [api health channel-socket]}]
-  (let [{:keys [ajax-post-fn ajax-get-or-ws-handshake-fn]}
-        channel-socket]
-    ["/api"
-     ["/users"
-      {:get  dummy
-       :post dummy
-       :put  dummy}
-      ["/login"
-       {:post dummy}]]
-     ["/profiles/:username"
-      {:get dummy}
-      ["/follow"
-       {:post   dummy
-        :delete dummy}]]
-     ["/articles"
+  [{:keys [api]}]
+  ["/api"
+   ["/users"
+    {:get  dummy
+     :post dummy
+     :put  dummy}
+    ["/login"
+     {:post dummy}]]
+   ["/profiles/:username"
+    {:get dummy}
+    ["/follow"
+     {:post   dummy
+      :delete dummy}]]
+   ["/articles"
+    {:get  dummy
+     :post dummy}
+    ["/feed"
+     {:get dummy}]
+    ["/:slug"
+     {:get    dummy
+      :put    dummy
+      :delete dummy}
+     ["/comments"
       {:get  dummy
        :post dummy}
-      ["/feed"
-       {:get dummy}]
-      ["/:slug"
-       {:get    dummy
-        :put    dummy
-        :delete dummy}
-       ["/comments"
-        {:get  dummy
-         :post dummy}
-        ["/:id"
-         {:delete dummy}]]
-       ["/favorite"
-        {:post   dummy
-         :delete dummy}]]]]))
+      ["/:id"
+       {:delete dummy}]]
+     ["/favorite"
+      {:post   dummy
+       :delete dummy}]]]])
 
 ;;;; Component Lifecycle
 
