@@ -1,0 +1,24 @@
+{:env/env              #dyn/keyword #dyn/prop ["ENVIRONMENT" "dev"]
+ :env/development?     #ig/ref :env/env
+ :api/api              {:development? #ig/ref :env/development?
+                        :redis        #ig/ref :redis/client
+                        :streams      #ig/ref :redis/streams}
+ :api/event-processor  {:development? #ig/ref :env/development?}
+ :redis/client         {:pool {}
+                        :spec {:host     #dyn/prop ["REDIS_HOST" "localhost"]
+                               :port     #dyn/long #dyn/prop ["REDIS_PORT" "6379"]
+                               :password #dyn/prop ["REDIS_PASSWORD" nil]}}
+ :redis/streams        {:events    {:stream     #dyn/prop ["REDIS_EVENT_STREAM" "storefront-events"]
+                                    :batch-size 5
+                                    :client-id  #dyn/prop ["HOSTNAME" "localhost"]}
+                        :customers {:stream     #dyn/prop ["REDIS_CUSTOMER_STREAM" "customers"]
+                                    :batch-size 5
+                                    :client-id  #dyn/prop ["HOSTNAME" "localhost"]}}
+ :web/service          {:development?   #ig/ref :env/development?
+                        :cookie-name    #dyn/prop ["COOKIE_NAME" "onote_session"]
+                        :cookie-domain  #dyn/prop ["COOKIE_DOMAIN" "onote.com"]
+                        :cookie-key     #dyn/prop ["COOKIE_ENCRYPTION_KEY" "1234567890abcdef"]}
+ :web/server           {:service      #ig/ref :web/service
+                        :development? #ig/ref :env/development?
+                        :host         #dyn/prop           ["HTTP_HOST" "localhost"]
+                        :port         #dyn/long #dyn/prop ["HTTP_PORT" "8080"]}}
